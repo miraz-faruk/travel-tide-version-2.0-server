@@ -66,7 +66,7 @@ async function run() {
         app.get('/my-list/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
-            const result = await spotCollection.findOne(query);
+            const result = await touristSpotCollection.findOne(query);
             res.send(result);
         });
 
@@ -76,6 +76,41 @@ async function run() {
             console.log(newSpot);
             const result = await touristSpotCollection.insertOne(newSpot);
             res.send(result);
+        });
+
+        // Update spot by ID
+        app.put('/my-list/:id', (req, res) => {
+            const id = req.params.id;
+            const updatedSpot = req.body;
+            const query = { _id: new ObjectId(id) };
+            const update = {
+                $set: {
+                    image: updatedSpot.image,
+                    spotName: updatedSpot.spotName,
+                    country: updatedSpot.country,
+                    location: updatedSpot.location,
+                    description: updatedSpot.description,
+                    cost: updatedSpot.cost,
+                    seasonality: updatedSpot.seasonality,
+                    travelTime: updatedSpot.travelTime,
+                    visitors: updatedSpot.visitors,
+                    userEmail: updatedSpot.userEmail,
+                    userName: updatedSpot.userName,
+                },
+            };
+
+            touristSpotCollection.updateOne(query, update)
+                .then(result => {
+                    if (result.modifiedCount > 0) {
+                        res.status(200).json({ message: 'Spot updated successfully!' });
+                    } else {
+                        res.status(200).json({ message: 'No changes were made.' });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error updating spot:', error);
+                    res.status(500).json({ error: 'Failed to update the spot.' });
+                });
         });
 
         // Delete spot by ID
