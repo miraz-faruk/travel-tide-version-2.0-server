@@ -27,7 +27,7 @@ async function run() {
 
         const touristSpotCollection = client.db('touristSpotDB').collection('touristSpot');
 
-        // Get all tourists spots
+        // Get all tourist spots
         app.get('/tourist-spot', async (req, res) => {
             const cursor = touristSpotCollection.find();
             const result = await cursor.toArray();
@@ -42,6 +42,25 @@ async function run() {
             res.send(result);
         });
 
+        // Get spots added by a specific user
+        app.get('/my-list', (req, res) => {
+            const email = req.query.email;
+
+            if (!email) {
+                return res.status(400).send({ message: 'Email is required' });
+            }
+            // Query to find spots by user's email
+            const query = { userEmail: email };
+
+            touristSpotCollection.find(query).toArray()
+                .then(result => {
+                    res.send(result);
+                })
+                .catch(error => {
+                    console.error('Error fetching spots:', error);
+                    res.status(500).send({ message: 'Error fetching spots' });
+                });
+        });
 
         // Add new tourist spot
         app.post('/tourist-spot', async (req, res) => {
