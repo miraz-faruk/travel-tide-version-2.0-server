@@ -26,6 +26,7 @@ async function run() {
         await client.connect();
 
         const touristSpotCollection = client.db('touristSpotDB').collection('touristSpot');
+        const countryCollection = client.db('touristSpotDB').collection('countriesOfSoutheastAsia');
 
         // Get all tourist spots
         app.get('/tourist-spot', async (req, res) => {
@@ -40,6 +41,21 @@ async function run() {
             const query = { _id: new ObjectId(id) };
             const result = await touristSpotCollection.findOne(query);
             res.send(result);
+        });
+
+        // Get all countries
+        app.get('/countries', async (req, res) => {
+            const cursor = countryCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get tourist spots by country name
+        app.get('/tourist-spot/country/:countryName', async (req, res) => {
+            const countryName = req.params.countryName;
+            const query = { country: countryName };
+            const spots = await touristSpotCollection.find(query).toArray();
+            res.send(spots);
         });
 
         // Get spots added by a specific user
@@ -120,7 +136,6 @@ async function run() {
             const result = await touristSpotCollection.deleteOne(query);
             res.send(result);
         });
-
 
 
         // Send a ping to confirm a successful connection
