@@ -62,11 +62,27 @@ async function run() {
                 });
         });
 
+        // Get spot by ID
+        app.get('/my-list/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await spotCollection.findOne(query);
+            res.send(result);
+        });
+
         // Add new tourist spot
         app.post('/tourist-spot', async (req, res) => {
             const newSpot = req.body;
             console.log(newSpot);
             const result = await touristSpotCollection.insertOne(newSpot);
+            res.send(result);
+        });
+
+        // Delete spot by ID
+        app.delete('/tourist-spot/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await touristSpotCollection.deleteOne(query);
             res.send(result);
         });
 
